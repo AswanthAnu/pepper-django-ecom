@@ -1,0 +1,81 @@
+{% load static %}
+
+  <button class="navbar-toggler navbar-toggler-right d-lg-none bg-black align-self-center" type="button" data-toggle="offcanvas">
+    <span class="mdi mdi-menu"></span>
+  </button>
+<div class="container-fluid page-body-wrapper">
+    <!-- partial:partials/_sidebar.html -->
+    <nav class="sidebar sidebar-offcanvas row justify-content-start  bg-black" id="sidebar">
+      <ul class="nav">
+        <li class="nav-item nav-category">Main</li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">
+            <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+            <span class="menu-title">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_user' %}">
+              <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+              <span class="menu-title">Users</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_product' %}">
+              <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+              <span class="menu-title">Products</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">
+              <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+              <span class="menu-title">Orders</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_category' %}">
+              <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+              <span class="menu-title">Categories</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_brand' %}">
+              <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+              <span class="menu-title">Brands</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">
+              <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+              <span class="menu-title">Coupons</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">
+              <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+              <span class="menu-title">Offers</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">
+              <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+              <span class="menu-title">Banners</span>
+            </a>
+          </li>
+          
+       
+     
+       
+      
+        <li class="nav-item sidebar-user-actions">
+          <div class="sidebar-user-menu">
+            <a href="#" class="nav-link"><i class="mdi mdi-logout menu-icon"></i>
+              <span class="menu-title">Log Out</span></a>
+          </div>
+        </li>
+      </ul>
+    </nav>
+    <!-- partial -->
+            
+
+
