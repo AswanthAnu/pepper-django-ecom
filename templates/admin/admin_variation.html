@@ -1,0 +1,358 @@
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="main-panel">
+    
+  
+    <div class="container">
+        <div class="table-wrapper">
+            <div class="table-title "style="background-color:black;">
+                <div class="row">
+                    <div class="col-sm-6 ">
+						<h2>Variations </h2>
+					</div>
+					<div class="col-sm-6">
+						<a href="#addEmployeeModal" class="btn  btn-dark " data-toggle="modal"><span>Add</span></a>
+											
+					</div>
+                </div>
+            </div>
+			<div style='overflow-x:auto'>
+            <table class="table table-striped table-hover ">
+                <thead>
+                    <tr>
+						<th>
+							<span class="custom-checkbox">
+								
+								
+							</span>
+						</th>
+                        <th><h4>Product </h4></th>
+                        <th><h4>Variation Category</h4></th>
+						<th><h4>Variation value</h4></th>
+                        <th><h4>Action</h4></th>
+                    </tr>
+                </thead>
+                <tbody>
+				{% for variation in variations%}
+                    <tr>
+						<td>
+							
+						</td>
+						
+                        <td><h5>{{variation.product.product_name}}</h5></td>
+                        <td><h5>{{variation.variation_value}}</h5></td>
+						<td><h5>{{variation.variation_category}}</h5></td>
+						
+                        
+                        <td>
+                            <a href="#editEmployeeModal-{{variation.id}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Edit</span></a>
+							<a href="#deleteEmployeeModal-{{ variation.id}}" class="btn btn-dark btn-md" data-toggle="modal"><span>Delete</span></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+		</div>
+			<div class="clearfix">
+                
+                
+            </div>
+        </div>
+    </div>
+	<div >
+		<nav aria-label="Page navigation example" style="position: fixed; bottom:70px; right:70px;">
+		  {% if variations.has_other_pages %}
+		  <ul class="pagination pg-black">
+			{% if variations.has_previous %}
+			<li class="page-item  ">
+			<a class="page-link" href="?page={{ variations.previous_page_number}}" tabindex="-1" style="color: black;">Previous</a>
+			</li>
+			{% else %}
+			<li class="page-item  ">
+			<a class="page-link" href="#" tabindex="-1" style="color: black; display:none;"></a>
+			</li>
+			{% endif %}
+			
+		   
+			{% for i in variations.paginator.page_range %}
+			{% if variations.number == i %}
+			
+			<li class="page-item active">
+			<a class="page-link" style="background-color: black;">{{i}}<span class="sr-only">{{i}}</span></a>
+			</li>
+			{% else %}
+			<li class="page-item" style="color: black;"><a class="page-link" href="?page={{i}}" style="color: black;">{{i}}</a></li>
+			{% endif %}
+			{% endfor %}
+		   
+		   
+			{% if variations.has_next %}
+			<li class="page-item  ">
+			<a class="page-link" href="?page={{ variations.next_page_number}}" tabindex="-1" style="color: black;">Next</a>
+			</li>
+		   
+			{% else %}
+			<li class="page-item  ">
+			<a class="page-link" href="#" tabindex="-1" style="color: black;display:none;"></a>
+			</li>
+			{% endif %}
+		  </ul>
+		  </nav>
+		  {% endif %}
+		</div>
+	<!--Add Modal HTML -->
+	<div id="addEmployeeModal" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				
+				<form  method="POST" id="add_category" >
+					{% csrf_token %}
+					<div class="modal-header">						
+						<h4 class="modal-title">Add Variartion</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">					
+						
+						<div class="form-group">
+							<label>Product </label>
+							<select id="products"  name="products" type="text" class="form-control" required>
+							<option value="" selected>---------</option>
+							{% for product in products %}
+							<option data-style="btn-dark"  value="{{product.id}}">{{product.product_name}}</option>
+							{% endfor %}
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Variation Category</label>
+							<select id="variation_category"  name="variation_category" type="text" class="form-control" required>
+							<option value="" selected>---------</option>
+							
+							<option data-style="btn-dark"value="color">color</option>
+							<option data-style="btn-dark"value="size">size</option>
+							
+						    </select>
+						</div>
+						
+						<div class="form-group">
+							<label>Variartion Value</label>
+							<input id="variation_value"  name="variation_value" type="text" class="form-control" value="" placeholder="category value" required>
+						</div>
+											
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<button type="submit" class="btn btn-dark" >Add</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	
+
+<script>
+
+	$(document).on('submit', '#add_category', function (e) {
+		e.preventDefault();
+		var products = $('#products').val()
+		var variation_category = $('#variation_category').val()
+		var variation_value = $('#variation_value').val()
+		
+
+		$.ajax({
+			method: "POST",
+			url: "{% url 'add_variation' %}",
+			dataType: 'json',
+			data: {
+				'products': products,
+				'variation_category': variation_category,
+				'variation_value' : variation_value,
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+					window.location.replace('admin_variation')
+				} 
+				
+				else {
+					document.getElementById("variation_value").value="";
+					document.getElementById("variation_value").placeholder = "Type value here..";
+					document.getElementById("variation_value").style.border = "solid red 1px";
+				}
+			}
+		})
+
+
+	})
+	
+
+
+</script>
+
+
+
+
+<!-- Edit Modal HTML -->
+{% for variation in variations %}
+<div id="editEmployeeModal-{{variation.id}}" class="modal fade" >
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method = "POST"  id="edit_category-{{variation.id}}" >
+				{% csrf_token %}
+				<div class="modal-header">						
+					<h4 class="modal-title">Edit Variation</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div class="modal-body">					
+					<div class="form-group">
+						<label>Product </label>
+						<select id="update_products-{{variation.id}}"  name="products" type="text" class="form-control" required>
+						<option value="" selected>{{variation.product}}</option>
+						{% for product in products %}
+						<option data-style="btn-dark"  value="{{product.id}}">{{product.product_name}}</option>
+						{% endfor %}
+						</select>
+					</div>
+					<div class="form-group">
+						<label>Variation Category</label>
+						<select id="update_variation_category-{{variation.id}}"  name="variation_category" type="text" class="form-control" required>
+						<option value="" selected>{{variation.variation_category}}</option>
+						
+						<option data-style="btn-dark"value="color">color</option>
+						<option data-style="btn-dark"value="size">size</option>
+						
+						</select>
+					</div>
+					<div class="form-group">
+						<label>Variartion Value</label>
+						<input id="update_variation_value-{{variation.id}}"  name="variation_value" type="text" class="form-control" value="{{variation.variation_value}}" placeholder="category value" required>
+					</div>
+					<div class="form-group" style="display: none;" >
+						<label>Variartion id</label>
+						<input id="update_variation_id-{{variation.id}}"  name="variation_id" type="text" class="form-control" value="{{variation.id}}" placeholder="category value" >
+					</div>
+					
+									
+				</div>
+				<div class="modal-footer">
+					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+					<button type="submit" class="btn btn-dark" >Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+
+
+<script>
+
+	$(document).on('submit', '#edit_category-{{variation.id}}', function (e) {
+		e.preventDefault();
+		var products = $('#update_products-{{variation.id}}').val()
+		var variation_category = $('#update_variation_category-{{variation.id}}').val()
+		var variation_value = $('#update_variation_value-{{variation.id}}').val()
+		var variation_id = $('#update_variation_id-{{variation.id}}').val()
+		console.log(products)
+		console.log(variation_id)
+		
+		
+
+		$.ajax({
+			method: "POST",
+			url: "update_variation/"+variation_id,
+			dataType: 'json',
+			data: {
+				'products': products,
+				'variation_category': variation_category,
+				'variation_value' : variation_value,
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+					window.location.replace('admin_variation')
+				} 
+				
+				else {
+					document.getElementById("update_variation_value").value="";
+					document.getElementById("update_variation_value").placeholder = "Type value here..";
+					document.getElementById("update_variation_value").style.border = "solid red 1px";
+				}
+			}
+		})
+
+
+	})
+	
+
+
+</script>
+{% endfor %}
+<!-- Delete Modal HTML -->
+{% for variation in variations %}
+<div id="deleteEmployeeModal-{{variation.id}}" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="POST" id="delete_variation-{{variation.id}}" >
+				<div class="modal-header">						
+					<h4 class="modal-title">Delete Variation</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div class="modal-body">					
+					<p><h5>Are you sure you want to delete {{variation.variation_category}} variation of {{variation.product}} ?</h5></p>
+					<p class="text-warning"><small>This action cannot be undone </small></p>
+				</div>
+				<div class="form-group" style="display: none;" >
+					<label>Variartion id</label>
+					<input id="delete_variation_id-{{variation.id}}"  name="variation_id" type="text" class="form-control" value="{{variation.id}}" placeholder="category value" >
+				</div>
+				<div class="modal-footer">
+					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+					<button type="submit" class="btn btn-dark" >Delete</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+
+<script>
+
+	$(document).on('submit', '#delete_variation-{{variation.id}}', function (e) {
+		e.preventDefault();
+		var variation_id = $('#delete_variation_id-{{variation.id}}').val()
+		$.ajax({
+			method: "POST",
+			url: "delete_variation/"+variation_id,
+			dataType: 'json',
+			data: {
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+					window.location.replace('admin_variation')
+				} 
+				
+				
+			}
+		})
+
+
+	})
+	
+
+
+</script>
+{% endfor %}
+
+{% endblock %}

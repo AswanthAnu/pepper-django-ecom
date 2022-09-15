@@ -1,10 +1,16 @@
 {% extends 'base.html' %}
 
+{% load price_custom_tags %}
+
 {% load static %}
 
 {% block content%}
 
+
+
+
 <section class="products section">
+	
 	<div class="container">
 		<div class="row">
 			<div class="col-md-3">
@@ -28,7 +34,7 @@
 						        	</a>
 						      	</h4>
 						    </div>
-					    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
+					    <div id="collapseOne" class="panel-collapse collapse in " role="tabpanel" aria-labelledby="headingTwo">
 							<div class="panel-body">
 								<ul>{% for category in links %}
 									<li><a href="{{category.get_url}}">{{ category.category_name}}</a></li>
@@ -48,75 +54,158 @@
 					    </div>
 					    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
 					    	<div class="panel-body">
-					     		<ul>{% for category in links %}
-									<li><a href="{{category.get_url}}">{{ category.category_name}}</a></li>
+					     		<ul>{% for brand in link %}
+									<li><a href="{{brand.get_url}}">{{ brand.brand_name}}</a></li>
 									{% endfor %}
 								</ul>
 					    	</div>
 					    </div>
 					  </div>
+					  <h4 class="widget-title"></h4>
+					  <h4 class="widget-title"></h4>
+					  <h4 class="widget-title">Sub Categories</h4>
+					  <div class="panel-group commonAccordion" id="accordion" role="tablist" aria-multiselectable="true">
+						{% for category in links %}
+						<div class="panel panel-default">
+						    <div class="panel-heading" role="tab" id="headingOne">
+						      	<h4 class="panel-title">
+						        	<a role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ category.id}}" aria-expanded="true" aria-controls="collapseOne" class="collapsed">
+										{{ category.category_name}}
+						        	</a>
+						      	</h4>
+						    </div>
+					    <div id="{{ category.id}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+							<div class="panel-body">
+								<ul>
+									{% for i  in category.subcategory_set.all %}
+									<li><a href="/store/category/{{category.slug}}/{{i.slug}}">{{ i.sub_category_name }}</a></li>
+									{% endfor %}
+								</ul>
+							</div>
+					    </div>
+					  </div>
+					  {% endfor %}
+					
 					  <div class="panel panel-default">
 					    <div class="panel-heading" role="tab" id="headingThree">
-					      <h4 class="panel-title">
-					        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-					          	Filter
-					        </a>
-					      </h4>
-					    </div>
-					    <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-					    	<div class="panel-body">
-					      		<ul>
-									<li><a href="#!">Size</a></li>
-									<li><a href="#!">Color</a></li>
-									<li><a href="#!">Price</a></li>
-									<li><a href="#!"></a></li>
-								</ul>
-					    	</div>
+					   
 					    </div>
 					  </div>
 					</div>
 					
 				</div>
 			</div>
+		</div>
 			<div class="col-md-9">
 				<div class="row">
+					{% if products%}
 					<div class="row">
+						
                         {%for product in products%}
                         <div class="col-md-4">
                             <div class="product-item">
                                 <div class="product-thumb">
-                                    <span class="bage">Sale</span>
+									{% if product.discount > product.category.discount%}
+										{%if product.discount > 1%}
+											<span class="bage">Save {{product.discount}} %</span>
+										{% endif %}
+									{% else %}
+										{%if product.category.discount > 1%}
+											<span class="bage">Save {{product.category.discount}} %</span>
+										{% endif %}
+									{% endif %}
                                     <img class="img-responsive" src="{{product.images.url}}" alt="product-img" />
                                     <div class="preview-meta">
                                         <ul>
                                             <li>
-                                                <span  data-toggle="modal" data-target="#product-modal">
+                                                <span  data-toggle="modal" data-target="#product-modal-{{ product.id }}">
                                                     <i class="tf-ion-ios-search-strong"></i>
                                                 </span>
                                             </li>
-                                            <li>
-                                                <a href="#!" ><i class="tf-ion-ios-heart"></i></a>
-                                            </li>
-											{% if product.stock != 0 %}
-                                            <li>
-                                                <a href="{% url 'add_cart' product.id %}"><i class="tf-ion-android-cart"></i></a>
-                                            </li>
-											{% else %}
-											
-											{% endif %}
+                                            
+										
                                         </ul>
                                       </div>
                                 </div>
                                 <div class="product-content">
-                                    <h4><a href="{{ product.get_url }}">{{product.product_name}}</a></h4>
-                                    <p class="price">Rs.{{product.price}}</p>
-                                </div>
+									<h4><a href="{{ product.get_url }}">{{product.product_name}}</a></h4>
+									{% if product.discount > product.category.discount %}
+										{% if product.discount > 1%}
+											<span class="price">Rs. <del>{{product.price}}</del>
+												&nbsp; &nbsp;
+											<span >{% sell_price product.price product.discount  %}</span>
+											</span>
+										{% else %}
+											<span class="price">Rs.{{product.price}}</span>
+										{% endif %}
+									{% else %}
+										{% if product.category.discount > 1%}
+											<span class="price">Rs. <del>{{product.price}}</del>
+												&nbsp; &nbsp;
+											<span >{% sell_price product.price product.category.discount  %}</span>
+											</span>
+										{% else %}
+											<span class="price">Rs.{{product.price}}</span>
+										{% endif %}
+									{% endif %}
+			
+								</div>
                             </div>
                         </div>
                         {% endfor %}
+						{%for product in products%}
+						<!-- Modal -->
+						<div class="modal product-modal fade" id="product-modal-{{ product.id }}">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<i class="tf-ion-close"></i>
+							</button>
+							  <div class="modal-dialog " role="document">
+								<div class="modal-content">
+									  <div class="modal-body">
+										<div class="row">
+											<div class="col-md-8 col-sm-6 col-xs-12">
+												<div class="modal-image">
+													<img class="img-responsive" src="{{product.images.url}}" alt="product-img" />
+												</div>
+											</div>
+											<div class="col-md-4 col-sm-6 col-xs-12">
+												<div class="product-short-details">
+													<h2 class="product-title">{{product.product_name}}</h2>
+													<p class="product-price">Rs.{{product.price}}</p>
+													<p class="product-short-description">
+														
+													</p>
+													<a href="{{ product.get_url }}" class="btn btn-main">View Product details</a>
+								
+										</div>
+									</div>
+								</div>
+												</div>
+											
+							  </div>
+						</div><!-- /.modal -->
+				
+						</div>
+					{% endfor %}
+					</div>
+						
+						
 				</div>		
-			
+				{% else %}
+				<div class="col-md-8">
 					
+							<h4>No result found. Please try again.
+
+				
+					</div>
+				</div>
+				
+						
+			
+				
+                        </div>
+
+					{% endif %}
 					<nav aria-label="Page navigation example">
 						{% if products.has_other_pages %}
 						<ul class="pagination pg-black">

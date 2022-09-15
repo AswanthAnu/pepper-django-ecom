@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 
+from decouple import config
 
 
 
@@ -25,12 +26,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-j0v&-mm-q*^xxx$cjh8a&5+k3gk-v2g@#gbb^n-j7(rj&hninx'
+SECRET_KEY = config('SECRET_KEY') 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['pepperecommerce-env.eba-4ym5mbv2.us-west-2.elasticbeanstalk.com']
 
 
 # Application definition
@@ -42,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+
     'homeapp.apps.HomeappConfig',
     'accounts.apps.AccountsConfig',
     'category.apps.CategoryConfig',
@@ -49,6 +52,7 @@ INSTALLED_APPS = [
     'store.apps.StoreConfig',
     'admin_panel.apps.AdminPanelConfig',
     'carts.apps.CartsConfig',
+    'orders.apps.OrdersConfig',
    
    
 ]
@@ -77,7 +81,10 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'category.context_processors.menu_links',
+              
                 'carts.context_processors.counter',
+                'brand.context_processors.menu_links',
+
             ],
         },
     },
@@ -125,7 +132,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE =  'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -160,5 +167,25 @@ MESSAGE_TAGS = {
 
 #twilio
 
-account_sid = 'AC158fc54ebc80234dce390049a8f81b04'
-auth_token = '22cbf2ebf45b6e1f90f4e969f4c53873'
+ACCOUNT_SID = config("ACCOUNT_SID")
+TOKEN_SID = config("TOKEN_SID")
+SERVICES = config("SERVICES")
+
+#razor pay
+
+RAZOR_KEY_ID = config('RAZOR_KEY_ID')
+RAZOR_KEY_SECRET = config('RAZOR_KEY_SECRET')
+
+# SMTP configuration
+EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST ='smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER ='exq.see.me@gmail.com'
+EMAIL_HOST_PASSWORD =''
+EMAIL_USE_TLS = True
+
+
+#currency converter
+
+
+API_KEY = config("API_KEY")

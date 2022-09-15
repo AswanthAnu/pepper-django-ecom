@@ -1,10 +1,14 @@
+from ast import Delete
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Cart, CartItem
-from store.models import product, Variation
+from accounts.models import Account, Address
+from store.models import product, Variation, Coupon
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
-# Create your views here.
+from django.http import JsonResponse
+from orders.models import Order
+from django.db.models import Q
 
 
 
@@ -30,6 +34,7 @@ def add_cart(request, product_id):
             for item in request.POST:
                 key = item
                 value = request.POST[key]
+
 
                 try:
                     varia = Variation.objects.get(product = prod, variation_category__iexact = key, variation_value__iexact = value)
@@ -80,9 +85,11 @@ def add_cart(request, product_id):
                 cart_item.variation.clear()
                 cart_item.variation.add(*product_variation)
             cart_item.save()
+
         
 
         return redirect('cart')
+     
 
    # if the user is not auth
 
@@ -161,6 +168,55 @@ def add_cart(request, product_id):
         
 
         return redirect('cart')
+     
+
+                    
+def update_cart(request,product_id ):
+
+    current_user = request.user
+  
+     
+    #fetching the product
+    # if the user is authenticated
+    if current_user.is_authenticated:
+        
+        product_variation = []
+
+      
+
+        cart_id = product_id
+
+
+        cart_ite = CartItem.objects.get(id = cart_id)
+        cart_ite.quantity += 1
+        cart_ite.save()
+
+        cart_q = cart_ite.quantity
+        
+
+        return HttpResponse(cart_q)
+     
+
+   # if the user is not auth
+
+    else:
+
+        if request.method == 'POST':
+
+            cart_id = request.POST['cart_id']
+
+            cart_ite = CartItem.objects.filter(id = cart_id)
+            cart_ite.quantity += 1
+            cart_ite.save()
+
+            cart_q = cart_ite.quantity
+
+        return HttpResponse(cart_q)
+     
+
+
+
+
 
 
 def cart(request, total = 0, quantity = 0 , cart_items = None):
@@ -175,12 +231,15 @@ def cart(request, total = 0, quantity = 0 , cart_items = None):
             cart =  Cart.objects.get(cart_id = _cart_id(request))
             cart_items = CartItem.objects.filter(cart = cart , is_active = True)
         for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
-            print(total)
+            if cart_item.product.discount > cart_item.product.category.discount:
+                total += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.discount * 0.01 ))* cart_item.quantity)
+            else:
+                total += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.category.discount * 0.01 ))* cart_item.quantity)
+
             quantity += cart_item.quantity
 
-        gst = (17 * total)/100
-        grand_total = total + gst
+        gst = int((12 * total)/100)
+        grand_total = int(total + gst)
     except ObjectDoesNotExist:
         pass
 
@@ -209,13 +268,15 @@ def remove_cart(request, product_id, cart_item_id):
         if cart_item.quantity > 1:
             cart_item.quantity -= 1
             cart_item.save()
+            cart_q =  cart_item.quantity
         else:
             cart_item.delete()
 
     except:
         pass
 
-    return redirect('cart')
+    #return redirect('cart')
+    return HttpResponse(cart_q)
 
 
 def remove_cart_item(request, product_id, cart_item_id):
@@ -227,42 +288,221 @@ def remove_cart_item(request, product_id, cart_item_id):
         cart = Cart.objects.get(cart_id = _cart_id(request))
         cart_item = CartItem.objects.get(product = prod, cart = cart, id = cart_item_id)
     cart_item.delete()
-    return redirect('cart')
+    return JsonResponse({"success" : True}, safe= False)
 
 
 
 
 @login_required(login_url = 'login')
-def checkout(request, total = 0, quantity = 0 , cart_items = None):
+def checkout(request, totals = 0, quantity = 0 , cart_items = None):
 
 
-    try:
+    # try:
         total = 0
         gst = 0
         grand_total = 0
+        coupon_discount_total=0
+        coupon_code = 0
+        cart_ii=[]
+        cart_item_id = 0
         if request.user.is_authenticated:
             cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+            cart_ii = CartItem.objects.values().filter(user=request.user).order_by('id')[:1]
+            addresses = Address.objects.filter(user = request.user)
+    
         else:
             cart = Cart.objects.get(cart_id=_cart_id(request))
             cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+            cart_ii = CartItem.objects.values().filter(cart=cart, is_active=True).order_by('id')[:1]
         for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
-            print(total,'============')
+            if cart_item.product.discount > cart_item.product.category.discount:
+                totals += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.discount * 0.01 ))* cart_item.quantity)
+            else:
+                totals += (int(cart_item.product.price - (cart_item.product.price * cart_item.product.category.discount * 0.01 ))* cart_item.quantity)
+            
             quantity += cart_item.quantity
+            for i in cart_ii:
+                cart_item_id = (i['id'])
 
-        gst = (17 * total)/100
-        grand_total = total + gst
-        print(grand_total, '==============')
-    except ObjectDoesNotExist:
-        pass
+            cart_i = CartItem.objects.get(id =cart_item_id)
+            coupon_code = cart_i.coupon
+           
+            try:        #coupon_code = cart_i.coupon
+                coupon = Coupon.objects.get(coupon_code = coupon_code)
+                coupon_code_ = Coupon.objects.get(coupon_code = coupon_code)
+                coupon_discount = coupon_code_.disccount
+
+                coupon_discount_total = int((totals * (coupon_discount/100)))
+                if coupon_discount_total > coupon_code_.maximum_amount:
+                    coupon_discount_total = coupon_code_.maximum_amount
+                elif coupon_discount_total < coupon_code_.minimum_amount:
+                    coupon_discount_total = coupon_code_.minimum_amount
+
+                total = totals - coupon_discount_total
+
+            except:
+                total = totals
+
+        gst = int((12 * total)/100)
+        grand_total = int(total + gst)
+        request.session["grand_total"] = grand_total
+        
+    # except ObjectDoesNotExist:
+        # pass
 
  
-    context = {
-        'total' : total,
-        'quantity' : quantity, 
-        'cart_items' : cart_items,
-        'gst' : gst,
-        'grand_total' : grand_total,
-    }
-    print(context)
-    return render(request, 'store/checkout.html', context )
+        context = {
+            'totals' : totals,
+            'total' : total,
+            'coupon_discount_total': coupon_discount_total,
+            'quantity' : quantity, 
+            'cart_items' : cart_items,
+            'coupon_code' : coupon_code,
+            'gst' : gst,
+            'grand_total' : grand_total,
+            'addresses' : addresses,
+        }
+        
+        return render(request, 'store/checkout.html', context )
+
+
+
+
+def coupon(request):
+
+    cart_coupon = None
+    cart_ii=[]
+    cart_item_id = 0
+    if request.method == "GET":
+        coupon_code = request.GET['coupon_code']
+        try:
+            coupon = Coupon.objects.get(coupon_code = coupon_code)
+        except:
+            return JsonResponse({'exist' : False}, safe= False)
+        
+        
+        try:
+
+            if coupon.is_expired == False:
+                if request.user.is_authenticated:
+                    user = request.user 
+                    cart_ii = CartItem.objects.values().filter(user=request.user).order_by('id')[:1]
+
+                    for i in cart_ii:
+                        cart_item_id = (i['id'])
+                    cart_i = CartItem.objects.get(id =cart_item_id)
+                    cart_coupon = cart_i.coupon
+
+
+                    if cart_coupon == coupon_code:
+
+                        return JsonResponse(
+                        {
+                        'coupon_exist' : True,
+                        
+                        },safe= False
+                                            )
+                    elif Order.objects.filter(Q(user_id = user.id)& Q(coupon_id = coupon.id) & Q(is_ordered = True)).exists():
+                        return JsonResponse(
+                        {
+                        'already' : True,
+                        
+                        },safe= False
+                                            )
+
+
+                    else:
+                        cart_i.coupon = coupon_code
+                        cart_i.save()
+                else:
+                    cart = Cart.objects.get(cart_id=_cart_id(request))
+                    cart_ii = CartItem.objects.values().filter(user=request.user).order_by('id')[:1]
+                    for i in cart_ii:
+                        cart_item_id = (i['id'])
+                    cart_i = CartItem.objects.get(id =cart_item_id)
+                    coupon_code = cart_i.coupon
+                    if cart_i.coupon == coupon_code:
+                        return JsonResponse(
+                        {
+                        'coupon_exist' : False,
+                        
+                        },safe= False
+                                            )
+
+                    else:
+                        cart_i.coupon = coupon_code
+                        cart_i.save()
+
+
+
+                return JsonResponse(
+                    {
+                        'success' : True,
+                    },safe= False
+                )
+            else:
+                return JsonResponse(
+                    {
+                        'success' : False,
+                    },safe= False
+                )
+
+    
+        except:
+            return JsonResponse(
+                    {
+                        'coupon_valid' : False,
+                        
+                    },safe= False
+                )
+    return JsonResponse(
+                    {
+                        'coupon_valid' : True,
+                        
+                    },safe= False
+                )
+
+def remove_coupon(request):
+
+
+    if request.method == "GET":
+
+
+        if request.user.is_authenticated:
+            cart_ii = CartItem.objects.values().filter(user=request.user).order_by('id')[:1]
+            for i in cart_ii:
+                cart_item_id = (i['id'])
+            cart_i = CartItem.objects.get(id =cart_item_id)
+            cart_i.coupon = None
+            cart_i.save()
+
+            return JsonResponse(
+            {
+            'success' : True,
+            
+            },safe= False
+                                )
+
+                    
+        else:
+            cart = Cart.objects.get(cart_id=_cart_id(request))
+            cart_ii = CartItem.objects.values().filter(user=request.user).order_by('id')[:1]
+            for i in cart_ii:
+                cart_item_id = (i['id'])
+            cart_i = CartItem.objects.get(id =cart_item_id)
+            cart_i.coupon = None
+            cart_i.save()
+            return JsonResponse(
+            {
+            'success' : False,
+            
+            },safe= False
+                                )
+
+    else:               
+        return JsonResponse(
+            {
+                'notget' : True,
+            },safe= False
+        )
+

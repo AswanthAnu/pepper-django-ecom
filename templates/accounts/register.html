@@ -12,9 +12,14 @@
           <a class="logo" href="index.html">
             <img src="images/logo.png" alt="">
           </a>
-          {% include 'includes/alerts.html' %}
+          <div style="color:rgb(251, 112, 112); " >
+                {{form.email.errors}}
+                {{form.non_field_errors}}
+                {% include 'includes/alerts.html' %}
+            </div>
+          
           <h2 class="text-center">Create Your Account</h2>
-          <form class="text-left clearfix" action="{% url 'register'%}" method='POST'>
+          <form class="text-left clearfix"  method='POST' id='form_id'>
              {% csrf_token %}
             <div class="form-group">
              {{form.first_name}}
@@ -35,11 +40,10 @@
               {{form.confirm_password}}
             </div>
             <div class="text-center">
-              {% comment %} <input type="button" class="btn btn-main text-center" id="btnsave" value="Sign In"> </input> {% endcomment %}
-              <button type="submit" class="btn btn-main text-center" >Signin</button>
+              
+              <input type="submit" class="btn btn-main text-center" .value="Signup" >
             </div>
-             {{form.email.errors}}
-             {{form.non_field_errors}}
+            
           </form>
           <p class="mt-20">Already hava an account ?<a href="{%url 'login' %}"> Login</a></p>
           <p><a href="forget-password.html"> Forgot your password?</a></p>
@@ -50,61 +54,87 @@
 </section>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
 <script>
-  $("#btnsave").click(function()
-  {console.log("save button clicked");
-   let email=$('#email_id').val()
-   let first_name=$('#first_name_id').val()
-   let last_name=$('#last_name_id').val()
-   let phone_number=$('#phone_number_id').val()
-   let password=$('#password_id').val()
-   let confirm_password=$('#confirm_password_id').val()
-   let csrf = $("input[name=csrfmiddlewaretoken]").val()
-   if( first_name == ""){
-    console.log("please enter first_name");
-   }
-   else if ( last_name == "") {
-    console.log("please enter last_name");
-   }
-   else if ( email == "") {
-    console.log("please enter email");
-   }
+  $(document).on('submit', '#form_id', function (e) {
+		e.preventDefault();
+		var first_name = $('#first_name_id').val()
+    var last_name = $('#last_name_id').val()
+    var phone_number = $('#phone_number_id').val()
+    var email = $('#email_id').val()
+    var password = $('#password_id').val()
+    var confirm_password = $('#confirm_password_id').val()
+		
+    console.log(first_name)
+    console.log(phone_number)
 
-   else if ( phone_number == "") {
-    console.log("please enter phone_number");
-   }
+		$.ajax({
+      
+			type: 'POST',
+			url: '{{register}}',
+			dataType: 'json',
+			data: {
+        'first_name' : first_name,
+        'last_name' : last_name,
+        'phone_number' : phone_number,
+        'email' : email,
+        'password' : password,
+        'confirm_password' : confirm_password,
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.first_name == true) {
+					document.getElementById("first_name_id").value="";
+					document.getElementById("first_name_id").placeholder = "First name required";
+					document.getElementById("first_name_id").style.border = "solid red 1px";
+          document.getElementById("password_id").value="";
+          document.getElementById("confirm_password_id").value="";
+          
+				}
+        else if (responce.first_name == false) {
+					document.getElementById("last_name_id").value="";
+					document.getElementById("last_name_id").placeholder = "Last name required";
+					document.getElementById("last_name_id").style.border = "solid red 1px";
+          document.getElementById("password_id").value="";
+          document.getElementById("confirm_password_id").value="";
+				}
+        else if (responce.phone_number == true) {
+					document.getElementById("otp").value="";
+					document.getElementById("otp").placeholder = "10 digits required";
+					document.getElementById("otp").style.border = "solid red 1px";
+          document.getElementById("password_id").value="";
+          document.getElementById("confirm_password_id").value="";
+				}
+        else if (responce.phone_number == false) {
+					document.getElementById("email_id").value="";
+					document.getElementById("email_id").placeholder = "Email already exists";
+					document.getElementById("email_id").style.border = "solid red 1px";
+          document.getElementById("password_id").value="";
+          document.getElementById("confirm_password_id").value="";
+				}
+        else if (responce.success == false) {
+					document.getElementById("phone_number_id").value="";
+					document.getElementById("phone_number_id").placeholder = "10 digits required";
+					document.getElementById("phone_number_id").style.border = "solid red 1px";
+          document.getElementById("password_id").value="";
+          document.getElementById("confirm_password_id").value="";
+				}
+        else if (responce.success == true) {
+          console.log(responce)
+          
+            window.location.replace("{% url 'otp_registration' %}"+ phone_number );
+  
+            
+				}
+			}
+		})
 
-   else if ( password == "") {
-    console.log("please enter password");
-   }
 
-   else if ( confirm_password == "") {
-    console.log("please enter confirm_password");
-   }else {
-    //console.log(first_name);
-   // console.log(last_name);
-    //console.log(email);
-   // console.log(phone_number);
-   // console.log(password);
-    
-    ///var temp = email.split("@");
-    //var username = temp[0];
-
-    mydata = {first_name : first_name, last_name : last_name,  email : email, phone_number : phone_number, password : password, confrim_password : confirm_password, csrfmiddlewaretoken :csrf };
-    $.ajax({
-      url: "",
-      method: "POST",
-      data: mydata,
-      success: function(data) {
-        console.log(data);
-      },
-    });
-    console.log(mydata);
-    
-   }
-  });
-
+	})
+	
 </script>
+
 
 
 {% endblock %}

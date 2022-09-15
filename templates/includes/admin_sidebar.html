@@ -7,59 +7,94 @@
     <!-- partial:partials/_sidebar.html -->
     <nav class="sidebar sidebar-offcanvas row justify-content-start  bg-black" id="sidebar">
       <ul class="nav">
-        <li class="nav-item nav-category">Main</li>
+        <li class="nav-item nav-category"><h4>Main</h4></li>
         <li class="nav-item">
-          <a class="nav-link" href="index.html">
+          <a class="nav-link" href="{% url 'admin_dashboard'%}">
+            <span class="icon-bg"" ><i class="mdi mdi-cube menu-icon"></i></span>
+            <span class="menu-title"><h5>Dashboard</h5></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'admin_sales' %}">
             <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-            <span class="menu-title">Dashboard</span>
+            <span class="menu-title"><h5>Sales Report</h5></span>
           </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{% url 'admin_user' %}">
               <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-              <span class="menu-title">Users</span>
+              <span class="menu-title"><h5>Users</h5></span>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'admin_product' %}">
               <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-              <span class="menu-title">Products</span>
+              <span class="menu-title"><h5>Products</h5></span>
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="index.html">
-              <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-              <span class="menu-title">Orders</span>
-            </a>
-          </li>
+          
           <li class="nav-item">
             <a class="nav-link" href="{% url 'admin_category' %}">
               <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-              <span class="menu-title">Categories</span>
+              <span class="menu-title"><h5>Categories</h5></span>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'admin_brand' %}">
               <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-              <span class="menu-title">Brands</span>
+              <span class="menu-title"><h5>Brands</h5></span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="index.html">
+            <a class="nav-link" href="{% url 'admin_variation' %}">
               <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-              <span class="menu-title">Coupons</span>
+              <span class="menu-title"><h5>Variations</h5></span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="index.html">
+            <a class="nav-link" href="{% url 'admin_subcategory' %}">
               <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-              <span class="menu-title">Offers</span>
+              <span class="menu-title"><h5>Sub Category</h5></span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="index.html">
+            <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic1" aria-expanded="false" aria-controls="ui-basic1">
               <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-              <span class="menu-title">Banners</span>
+              <span class="menu-title"><h5>Orders</h5></span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="ui-basic1">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="{% url 'admin_order' %}"><h5>Order details</h5></a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'admin_return' %}"><h5>Return details</h5></a></li>
+                
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+              <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+              <span class="menu-title"><h5>Offers</h5></span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="ui-basic">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="{% url 'admin_offer' %}"><h5>Product Offers</h5></a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'admin_offer_cat' %}"><h5>Category Offers</h5></a></li>
+                
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_coupon' %}">
+              <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+              <span class="menu-title"><h5>Coupons</h5></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_banner' %}">
+              <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+              <span class="menu-title"><h5>Banners</h5></span>
             </a>
           </li>
           
@@ -69,8 +104,8 @@
       
         <li class="nav-item sidebar-user-actions">
           <div class="sidebar-user-menu">
-            <a href="#" class="nav-link"><i class="mdi mdi-logout menu-icon"></i>
-              <span class="menu-title">Log Out</span></a>
+            <a href="{% url 'admin_login'%}" class="nav-link"><i class="mdi mdi-logout menu-icon"></i>
+              <span class="menu-title"><h5>Log Out</h5></span></a>
           </div>
         </li>
       </ul>

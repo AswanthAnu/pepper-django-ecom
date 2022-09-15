@@ -1,42 +1,27 @@
 {% extends 'base.html' %}
 
+{% load price_custom_tags %}
+
 {% load static %}
 
+
 {% block content %}
+
 <div class="hero-slider">
-  <div class="slider-item th-fullpage hero-area" style="background-image: {% static 'images/slider/slider-1.jpg' %};">
+	{% for banner in banners %}
+  <div class="slider-item th-fullpage hero-area" style = "background-image: url({{banner.banner_image.url}});">
     <div class="container">
       <div class="row">
         <div class="col-lg-8 text-center">
           <p data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".1">PRODUCTS</p>
           <h1 data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".5">The beauty of nature <br> is hidden in details.</h1>
-          <a data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".8" class="btn" href="shop.html">Shop Now</a>
+          <a data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".8" class="btn" href="{% url 'store' %}">Shop Now</a>
         </div>
       </div>
     </div>
   </div>
-  <div class="slider-item th-fullpage hero-area" style="background-image:{% static 'images/slider/slider-3.jpg' %};">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 text-left">
-          <p data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".1">PRODUCTS</p>
-          <h1 data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".5">The beauty of nature <br> is hidden in details.</h1>
-          <a data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".8" class="btn" href="shop.html">Shop Now</a>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="slider-item th-fullpage hero-area" style="background-image: {% static 'images/slider/slider-2.jpg' %};">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 text-right">
-          <p data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".1">PRODUCTS</p>
-          <h1 data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".5">The beauty of nature <br> is hidden in details.</h1>
-          <a data-duration-in=".3" data-animation-in="fadeInUp" data-delay-in=".8" class="btn" href="shop.html">Shop Now</a>
-        </div>
-      </div>
-    </div>
-  </div>
+  {% endfor %}
+ 
 </div>
 
 <section class="product-category section">
@@ -50,19 +35,19 @@
 			<div class="col-md-6">
 				<div class="category-box">
 					<a href="#!">
-						<img src="{% static 'images/shop/category/category-.jpg' %}" alt="" />
-						<div class="content">
-							<h3>Clothes Sales</h3>
-							<p>Shop New Season Clothing</p>
+						<img src="https://images.unsplash.com/photo-1488693236539-d8f00a91b7ca?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MzV8fHZpbnRhZ2UlMjB3b21lbnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60" alt="" />
+						<div class="content" >
+							<h3 style="color: white;">Clothes Sales</h3>
+							<p style="color: white;">Shop For Special Occasions</p>
 						</div>
 					</a>	
 				</div>
 				<div class="category-box">
 					<a href="#!">
-						<img src="{% static 'images/shop/category/category-.jpg' %}" alt="" />
+						<img src="https://images.unsplash.com/photo-1468186376524-b53e47314061?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NDF8fHZpbnRhZ2UlMjB3b21lbnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60" alt="" />
 						<div class="content">
-							<h3>Smart Casuals</h3>
-							<p>Get Wide Range Selection</p>
+							<h3 style="color: white;">Smart Casuals</h3>
+							<p style="color: white;">Get Wide Range Selection</p>
 						</div>
 					</a>	
 				</div>
@@ -70,10 +55,10 @@
 			<div class="col-md-6">
 				<div class="category-box category-box-2">
 					<a href="#!">
-						<img src="{% static 'images/shop/category/category-.jpg' %}" alt="" />
+						<img src="https://images.unsplash.com/photo-1599058919476-4933715fa828?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NTN8fHZpbnRhZ2UlMjB3b21lbnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60" alt="" />
 						<div class="content">
-							<h3>Jewellery</h3>
-							<p>Special Design Comes First</p>
+							<h3  style="color: white;">Brands</h3>
+							<p  style="color: white;">Special Design Brands First</p>
 						</div>
 					</a>	
 				</div>
@@ -86,7 +71,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="title text-center">
-				<h2>Trendy Products</h2>
+				<h2>New Arrivals</h2>
 			</div>
 		</div>
 		<div class="row">
@@ -94,39 +79,60 @@
 			<div class="col-md-4">
 				<div class="product-item">
 					<div class="product-thumb">
-						<span class="bage">Sale</span>
+						{% if product.discount > product.category.discount %}
+							{%if product.discount > 1%}
+								<span class="bage">Save {{product.discount}} %</span>
+							{% endif %}
+						{% else %}
+							{%if product.category.discount > 1%}
+								<span class="bage">Save {{product.category.discount}} %</span>
+							{% endif %}
+						{% endif %}
 						 <a href="{{ product.get_url }}" class="img-wrap"><img  src="{{product.images.url}}" ></a>
 						<div class="preview-meta">
 							<ul>
 								<li>
-									<span  data-toggle="modal" data-target="#product-modal">
+									<span  data-toggle="modal" data-target="#product-modal-{{ product.id }}">
 										<i class="tf-ion-ios-search-strong"></i>
 									</span>
 								</li>
-								<li>
-			                        <a href="#!" ><i class="tf-ion-ios-heart"></i></a>
-								</li>
-								{% if product.stock != 0 %}
-								<li>
-									<a href="{% url 'add_cart' product.id %}"><i class="tf-ion-android-cart"></i></a>
-								</li>
-								{% else %} 
 								
-								{% endif %}
 							</ul>
                       	</div>
 					</div>
 					<div class="product-content">
 						<h4><a href="{{ product.get_url }}">{{product.product_name}}</a></h4>
-						<p class="price">Rs.{{product.price}}</p>
+
+						{% if product.discount > product.category.discount %}
+							{% if product.discount > 1%}
+								<span class="price">Rs. <del>{{product.price}}</del>
+									&nbsp; &nbsp;
+								<span >{% sell_price product.price product.discount  %}</span>
+								</span>
+							{% else %}
+								<span class="price">Rs.{{product.price}}</span>
+							{% endif %}
+						{% else %}
+							{% if product.category.discount > 1%}
+								<span class="price">Rs. <del>{{product.price}}</del>
+									&nbsp; &nbsp;
+								<span >{% sell_price product.price product.category.discount  %}</span>
+								</span>
+							{% else %}
+								<span class="price">Rs.{{product.price}}</span>
+							{% endif %}
+						{% endif %}
+
+								
+
 					</div>
 				</div>
 			</div>
-			{% endfor %}
 			
-		
+			{% endfor %}
+			{%for product in products%}
 		<!-- Modal -->
-		<div class="modal product-modal fade" id="product-modal">
+		<div class="modal product-modal fade" id="product-modal-{{ product.id }}">
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 				<i class="tf-ion-close"></i>
 			</button>
@@ -146,17 +152,18 @@
 			        				<p class="product-short-description">
 			        					
 			        				</p>
-			        				<a href="" class="btn btn-main">Add To Cart</a>
-			        				<a href="product-single.html" class="btn btn-transparent">View Product Details</a>
-			        			</div>
-			        		</div>
+			        				<a href="{{ product.get_url }}" class="btn btn-main">View Product details</a>
+			    
 			        	</div>
 			        </div>
 		    	</div>
+			        			</div>
+			        		
 		  	</div>
 		</div><!-- /.modal -->
 
 		</div>
+	{% endfor %}
 	</div>
 </section>
 
@@ -169,8 +176,7 @@ Start Call To Action
 		<div class="row">
 			<div class="col-md-12 text-center">
 				<div class="title">
-					<h2>SUBSCRIBE TO NEWSLETTER</h2>
-					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat, <br> facilis numquam impedit ut sequi. Minus facilis vitae excepturi sit laboriosam.</p>
+					
 				</div>
 				<div class="col-lg-6 col-md-offset-3">
 				    <div class="input-group subscription-form">
@@ -190,12 +196,12 @@ Start Call To Action
 	<div class="container">
 		<div class="row">
 			<div class="title">
-				<h2>View us on instagram</h2>
+				
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-12">
-				<div class="instagram-slider" id="instafeed" data-accessToken="IGQVJYeUk4YWNIY1h4OWZANeS1wRHZARdjJ5QmdueXN2RFR6NF9iYUtfcGp1NmpxZA3RTbnU1MXpDNVBHTzZAMOFlxcGlkVHBKdjhqSnUybERhNWdQSE5hVmtXT013MEhOQVJJRGJBRURn"></div>
+				
 			</div>
 		</div>
 	</div>
@@ -208,7 +214,7 @@ Start Call To Action
     =====================================-->
     
     <!-- Main jQuery -->
-    <script src="{% static 'plugins/jquery/dist/jquery.min.js' %}"></script>
+    <!-- <script src="{% static 'plugins/jquery/dist/jquery.min.js' %}"></script> -->
 	
     <!-- Bootstrap 3.1 -->
     <script src="{% static 'plugins/bootstrap/js/bootstrap.min.js' %}"></script>

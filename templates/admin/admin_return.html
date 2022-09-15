@@ -1,0 +1,118 @@
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+
+<div class="main-panel">
+    
+  
+    <div class="container">
+        <div class="table-wrapper ">
+            <div class="table-title "style="background-color:black;">
+                <div class="row">
+                    <div class="col-sm-6 ">
+						<h2>Return details </h2>
+					</div>
+					<div class="col-sm-6">
+						
+											
+					</div>
+                </div>
+            </div>
+		<div style='overflow-x:auto'>
+           
+            <table class="table table-striped table-hover col-sm-6 col-12">
+                <thead>
+                    <tr>
+						<th>
+							<span class="custom-checkbox">
+								
+								
+							</span>
+						</th>
+                        <th  class="text-center"><h4>Order ID</h4></th>
+                        <th  class="text-center"><h4>Billing Name</h4></th>
+                        <th  class="text-center"><h4>Product</h4></th>
+						<th  class="text-center"><h4>Reason</h4></th>
+						<th  class="text-center"><h4>Status</h4></th>
+                        
+                        
+                    </tr>
+                </thead>
+                <tbody>
+				{% for return_prodt  in return_products%}
+                    <tr>
+						<td>
+							
+						</td>
+                        <td  class="text-center"><h5>{{return_prodt.return_product.order.order_number}}</h5></td>
+                        <td  class="text-center"><h5>{{return_prodt.return_product.order.full_name}}</h5></td>
+                        <td  class="text-center"><h5>{{return_prodt.return_product.product}}</h5></td>
+						<td  class="text-center"><h5>{{return_prodt.reason}}</h5></td>
+						<td  class="text-center"><h5>Returned</h5></td>
+                   
+                    </tr>
+					</div>
+                {% endfor %}
+                </tbody>
+            </table>
+			<div class="clearfix">
+                
+             
+            </div>
+            
+		</div>
+		</div>
+		</div>
+               
+    </div>
+    
+	<div >
+        
+		<nav aria-label="Page navigation example" style="position: fixed; bottom:80px; right:70px;">
+		  {% if return_products.has_other_pages %}
+		  <ul class="pagination pg-black">
+			{% if return_products.has_previous %}
+			<li class="page-item  ">
+			<a class="page-link" href="?page={{ return_products.previous_page_number}}" tabindex="-1" style="color: black;">Previous</a>
+			</li>
+			{% else %}
+			<li class="page-item  ">
+			<a class="page-link" href="#" tabindex="-1" style="color: black; display:none;"></a>
+			</li>
+			{% endif %}
+			
+		   
+			{% for i in return_products.paginator.page_range %}
+			{% if return_products.number == i %}
+			
+			<li class="page-item active">
+			<a class="page-link" style="background-color: black;">{{i}}<span class="sr-only">{{i}}</span></a>
+			</li>
+			{% else %}
+			<li class="page-item" style="color: black;"><a class="page-link" href="?page={{i}}" style="color: black;">{{i}}</a></li>
+			{% endif %}
+			{% endfor %}
+		   
+		   
+			{% if return_products.has_next %}
+			<li class="page-item  ">
+			<a class="page-link" href="?page={{ return_products.next_page_number}}" tabindex="-1" style="color: black;">Next</a>
+			</li>
+		   
+			{% else %}
+			<li class="page-item  ">
+			<a class="page-link" href="#" tabindex="-1" style="color: black;display:none;"></a>
+			</li>
+			{% endif %}
+		  </ul>
+		  </nav>
+		  {% endif %}
+		</div>
+
+   
+	
+{% endblock %}

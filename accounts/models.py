@@ -1,3 +1,5 @@
+from distutils.command.upload import upload
+from tkinter import CASCADE
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 import uuid
@@ -44,7 +46,7 @@ class Account(AbstractBaseUser):
     last_name = models.CharField(max_length=50)
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=100, unique=True)
-    phone_number = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=50, unique=True)
     
     otp = models.CharField(max_length = 100, null = True , blank = True)
 
@@ -64,6 +66,10 @@ class Account(AbstractBaseUser):
     def __str__(self):
         return self.email
 
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
+
     def has_perm(self, perm, obj=None):
         return self.is_admin
 
@@ -78,3 +84,40 @@ class profile(models.Model):
     phone_number = models.CharField(max_length=20)
     otp = models.CharField(max_length = 100, null = True , blank = True)
     uid = models.UUIDField(default= uuid.uuid4)
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(Account, on_delete=models.CASCADE)
+    address_line_1 = models.CharField(blank=True, max_length=100)
+    address_line_2 = models.CharField(blank=True, max_length=100)
+    profile_picture = models.ImageField(upload_to='photos/userprofile', blank=True)
+    city = models.CharField(blank=True, max_length=20)
+    state = models.CharField(blank=True, max_length=20)
+    country = models.CharField(blank=True, max_length=20)
+
+
+    def __str__(self):
+        return self.user.first_name
+
+    def full_address(self):
+        return f'{self.address_line_1} {self.address_line_2}'
+
+
+class Address(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    email = models.EmailField(max_length=100)
+    phone_number = models.CharField(max_length=20)
+    address_line_1 = models.CharField(blank=True, max_length=100)
+    address_line_2 = models.CharField(blank=True, max_length=100)
+    city = models.CharField(blank=True, max_length=20)
+    state = models.CharField(blank=True, max_length=20)
+    country = models.CharField(blank=True, max_length=20)
+
+
+    def __str__(self):
+        return self.user.first_name
+
+    def full_address(self):
+        return f'{self.address_line_1} {self.address_line_2}'

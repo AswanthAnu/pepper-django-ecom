@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% load price_custom_tags %}
+
+{% load static %}
+
+{% block content%}
+<h3 class="widget-title text-center mb-10">Review Your Order and Make Payment </h3>
+<div class="page-wrapper">
+    <div class="checkout shopping">
+       <div class="container">
+          <div class="row">
+             <div class="col-md-8">
+                <div class="block billing-details">
+                
+
+                </div>
+                <div class="block">
+                   <h4 class="widget-title">Billing Address</h4>
+                   <p>{{ order.full_name}}</p>
+                   <p>{{ order.email}}</p>
+                   <p>{{ order.phone}}</p>
+                   <p>{{ order.full_address}}</p>
+                   <p>{{ order.city}} {{ order.state}}</p>
+                   <p>{{ order.country}}</p>
+                   {% if order.order_note %}
+                   <b>Order Note :</b> <p>{{ order.order_note}}</p>
+                   {% endif %}
+
+                   <div class="checkout-product-details">
+                      <div class="payment">
+                         <div class="card-details">
+                            <div class="block">
+                               <h4 class="widget-title">Payment Method</h4>
+                               <p>Cash On Delivery</p>
+                               <div class="checkout-product-details">
+                                  <div class="payment">
+                                     <div class="card-details">
+                                     
+                                     </div>
+                                  </div>
+                               </div>
+                            </div>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             </div>
+             <div class="col-md-4">
+                <div class="product-checkout-details">
+                     {% csrf_token %}
+                   <div class="block">
+                      <h4 class="widget-title">Product Review</h4>
+                      {% for cart_item in cart_items %}
+                      <div class="media product-card">
+                       
+                         <a class="pull-left" href="product-single.html">
+                            <img class="media-object" src=" {{ cart_item.product.images.url}}" alt="Image" />
+                         </a>
+                        
+                         <div class="media-body">
+                            <h4 class="media-heading"><p >{{ cart_item.product.product_name}}</p></h4>
+                            {% if cart_item.product.discount > cart_item.product.category.discount%}
+                            <p class="price">{{ cart_item.quantity}} x Rs.{% sell_price cart_item.product.price cart_item.product.discount %}.00</p>
+                            {% else %}
+                            <p class="price">{{ cart_item.quantity}} x Rs.{% sell_price cart_item.product.price cart_item.product.category.discount %}.00</p>
+                           {% endif %}
+                           </div>
+                      </div>
+                      
+                    {% endfor %}
+
+                  
+                      <ul class="summary-prices">
+                         <li>
+                            <span>Subtotal:</span>
+                            <span class="price">Rs.{{ totals }}.00 </span>
+                         </li>
+                         {% if coupon_code == None or coupon_code == 0 %}
+                         
+                        {% else %}
+                        <li>
+                           <span>Discount:</span>
+                           <span class="price">-Rs.{{ coupon_discount_total }}.00 </span>
+                        </li>
+                        {% endif %}
+                         
+                         <li>
+                                
+                            <span>Shipping:</span>
+                            <span>Free</span>
+                         </li>
+                           
+                         <li>
+                                
+                            <span>GST:</span>
+                            <span>Rs.{{ tax }}.00</span>
+                         </li>
+                         
+                      </ul>
+                      <div class="summary-total">
+                         <span>Total</span>
+                         <span>Rs.{{ grand_total}}.00</span>
+                      </div>
+                      <div>
+                      
+                        <button type='submit' onclick="payments_cod()" id='cod_submit'  class="btn btn-main mt-20" value="">Order</button >
+
+                      </div>
+                      
+                      
+                        <div class="verified-icon">
+                         <img src="">
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+ <script>
+
+   function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+  
+   function payments_cod(){
+     var amount = "{{ grand_total }}"
+     var csrftoken = getCookie('csrftoken');
+     var orderID = "{{order.order_number}}"
+     var payment_method = 'COD'
+     var redirect_url = "{% url 'order_success' %}"
+     // Render the PayPal button into #paypal-button-container
+     
+      
+      $.ajax({
+        type:'POST',
+        url:'{% url 'payments_cod'  %}',
+        dataType:'json',
+        data:{
+         'orderID': orderID,
+         
+         'payment_method': payment_method,
+         'status': 'COD',
+         csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success:function(response){
+          console.log(response)
+          if(response.success==true){
+            window.location.href = redirect_url + '?order_number='+response.order_number+'&payment_id='+response.transID;
+        }
+       
+      }
+      })
+      
+   }
+     
+     
+     
+
+    </script>
+    {% endblock %}

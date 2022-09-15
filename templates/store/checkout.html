@@ -1,10 +1,39 @@
 {% extends 'base.html' %}
+{% load price_custom_tags %}
 
 {% load static %}
 
 {% block content%}
 
 
+<div class="container mt-3">
+   <h4 class="widget-title">Select Address</h4>
+    <form>
+    
+      {% for address in addresses%}
+      <div class="form-check">
+         
+         <input class="form-check-input" type="radio"  name="address" id="flexRadioDefault{{address.id}}" value="{{address.id}}" onclick="handleChange({{address.id}})" >
+         <label class="form-check-label" for="flexRadioDefault1">
+            {{address.first_name}}.{{address.last_name}} : {{ address.full_address}}
+            <input type="text" style="display: none;" value="{{address.first_name}}" id ="f_name{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.last_name}}" id ="l_name{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.email}}" id ="emaill{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.phone_number}}" id ="p_number{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.address_line_1}}" id ="address1{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.address_line_2}}" id ="address2{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.state}}" id ="f_state{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.city}}" id ="f_city{{address.id}}">
+            <input type="text" style="display: none;" value="{{address.country}}" id ="f_country{{address.id}}">
+         </label>
+       
+      </div>
+      {% endfor %}
+  
+
+   </form>    
+ </div>
+ 
 <div class="page-wrapper">
     <div class="checkout shopping">
        <div class="container">
@@ -12,72 +41,80 @@
              <div class="col-md-8">
                 <div class="block billing-details">
                    <h4 class="widget-title">Billing Details</h4>
-                   <form class="checkout-form" action='' method='POST'>
+                   <form class="checkout-form" action="{% url 'place_order' %}" method='POST'>
+                    
+                     {% csrf_token %}
+                   
                      <div class="checkout-country-code clearfix">
                         <div class="form-group">
-                           <label for="full_name">First Name</label>
-                           <input type="text" class="form-control" id="full_name" placeholder="">
+                           <label >First Name</label>
+                           <input type="text" class="form-control" id="first_name" name="first_name"  value="{{addresses.first_name}}">
                         </div>
                         <div class="form-group" >
-                           <label for="last_name">last Name</label>
-                           <input type="text" class="form-control" id="last_name" placeholder="">
+                           <label >last Name</label>
+                           <input type="text" class="form-control" name="last_name" id="last_name"  value="{{addresses.last_name}}">
                         </div>
                      </div>
                      <div class="checkout-country-code clearfix">
                         <div class="form-group">
-                           <label for="email">Email</label>
-                           <input type="text" class="form-control" id="Email" placeholder="">
+                           <label >Email</label>
+                           <input type="email" class="form-control" name="email" id="email"  value=""> 
                         </div>
                         <div class="form-group" >
-                           <label for="phone_number">Phone Number</label>
-                           <input type="text" class="form-control" id="phone_number" placeholder="">
+                           <label >Phone Number</label>
+                           <input type="text" class="form-control" name="phone_number" id="phone_number" value="">
                         </div>
                      </div>
                       <div class="form-group">
-                         <label for="user_address">Address</label>
-                         <input type="text" class="form-control" id="user_address" placeholder="">
+                         <label >Address Line 1</label>
+                         <input type="text" class="form-control" name="address_line_1" id="address_line_1"  value="">
                       </div>
+                      <div class="form-group">
+                        <label >Address Line 2</label>
+                        <input type="text" class="form-control" name="address_line_2" id="address_line_2"  value="">
+                     </div>
                       <div class="checkout-country-code clearfix">
                          <div class="form-group">
-                            <label for="user_post_code">Zip Code</label>
-                            <input type="text" class="form-control" id="user_post_code" name="zipcode" value="">
+                            <label >state</label>
+                            <input type="text" class="form-control" id="state" name="state" value="">
                          </div>
                          <div class="form-group" >
-                            <label for="user_city">City</label>
-                            <input type="text" class="form-control" id="user_city" name="city" value="">
+                            <label >City</label>
+                            <input type="text" class="form-control" id="city" name="city" value="">
                          </div>
                       </div>
                       <div class="form-group">
-                         <label for="user_country">Country</label>
-                         <input type="text" class="form-control" id="user_country" placeholder="">
+                         <label >Country</label>
+                         <input type="text" class="form-control" id="country" name="country" value="">
+                      </div>
+                     <div class="form-group">
+                        <label >Order Note</label>
+                        <input type="text" class="form-control" id="order_note" name="order_note"  value="">
+                     </div>
+                     <div class="mt-3" style="margin-top:30px;">
+                     <h4 class="widget-title " >Payment Method</h4>
+                     </div>
+                     <div class="form-check">
+                        <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault1" value="cod_method">
+                        <label class="form-check-label" for="flexRadioDefault1">
+                          Cash On Delivery
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault2" value="paypal_method" checked>
+                        <label class="form-check-label" for="flexRadioDefault2">
+                          PayPal
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="payment_method" id="flexRadioDefault3" value="razor_method" >
+                        <label class="form-check-label" for="flexRadioDefault3">
+                          Razor Pay
+                        </label>
                       </div>
                  
                 </div>
-                <!-- <div class="block">
-                   <h4 class="widget-title">Payment Method</h4>
-                   <p>Credit Cart Details (Secure payment)</p>
-                   <div class="checkout-product-details">
-                      <div class="payment">
-                         <div class="card-details">
-                            <form  class="checkout-form">
-                               <div class="form-group">
-                                  <label for="card-number">Card Number <span class="required">*</span></label>
-                                  <input  id="card-number" class="form-control"   type="tel" placeholder="•••• •••• •••• ••••">
-                               </div>
-                               <div class="form-group half-width padding-right">
-                                  <label for="card-expiry">Expiry (MM/YY) <span class="required">*</span></label>
-                                  <input id="card-expiry" class="form-control" type="tel" placeholder="MM / YY">
-                               </div>
-                               <div class="form-group half-width padding-left">
-                                  <label for="card-cvc">Card Code <span class="required">*</span></label>
-                                  <input id="card-cvc" class="form-control"  type="tel" maxlength="4" placeholder="CVC" >
-                               </div>
-                              
-                            </form>
-                         </div>
-                      </div>
-                   </div>
-                </div> -->
+               
              </div>
              <div class="col-md-4">
                 <div class="product-checkout-details">
@@ -92,23 +129,48 @@
                         
                          <div class="media-body">
                             <h4 class="media-heading"><a href="{{ cart_item.product.get_url }}">{{ cart_item.product.product_name}}</a></h4>
-                            <p class="price">{{ cart_item.quantity}} x Rs.{{ cart_item.product.price }}.00</p>
+                            {% if cart_item.product.discount > cart_item.product.category.discount %}
+                            <p class="price">{{ cart_item.quantity}} x Rs.{% sell_price cart_item.product.price cart_item.product.discount %}.00</p>
+                            {% else %}
+                            <p class="price">{{ cart_item.quantity}} x Rs.{% sell_price cart_item.product.price cart_item.product.category.discount %}.00</p>
+                            {% endif %}
                             <span class="remove" > <a href="{% url 'remove_cart'  cart_item.product.id cart_item.id %}">Remove</a> </span>
                          </div>
                       </div>
                       
                     {% endfor %}
 
+                     {% if coupon_code == None or coupon_code == 0 %}
+                     <div class="discount-code">
+                        <p>Have a Coupon ? <a data-toggle="modal" data-target="#coupon-modal" href="#!">enter it here</a></p>
+                     </div>
+
+                     {% else %}
+
+                     <div class="discount-code">
+                        <p style="color: green;">Coupon Applied  &nbsp; &nbsp;&nbsp; &nbsp;<a data-toggle="modal" data-target="#coupon-modal" href="#!">Try another one ?</a></p>
+                     </div>
                      
-                      <div class="discount-code">
-                         <p>Have a discount ? <a data-toggle="modal" data-target="#coupon-modal" href="#!">enter it here</a></p>
-                      </div>
+                     <div class="discount-code">
+                        <button type="button" style="color:red;" class="btn" onclick="remo_coupons()">Remove coupon</button>
+
+                     </div>
+                     
+
+                      {% endif %}
                       <ul class="summary-prices">
                          <li>
                             <span>Subtotal:</span>
-                            <span class="price">Rs.Rs.{{ total }}.00 </span>
+                            <span class="price">Rs.{{ totals }}.00 </span>
                          </li>
+                         {% if coupon_code == None or coupon_code == 0 %}
                          
+                        {% else %}
+                        <li>
+                           <span>Discount:</span>
+                           <span class="price">-Rs.{{ coupon_discount_total }}.00 </span>
+                        </li>
+                        {% endif %}
                          <li>
                                 
                             <span>Shipping:</span>
@@ -118,16 +180,16 @@
                          <li>
                                 
                             <span>GST:</span>
-                            <span>Rs.{{ gst }}0</span>
+                            <span>Rs.{{ gst }}.00</span>
                          </li>
                          
                       </ul>
                       <div class="summary-total">
                          <span>Total</span>
-                         <span>Rs.{{ grand_total}}0</span>
+                         <span>Rs.{{ grand_total}}.00</span>
                       </div>
 
-                      <button type='submit' name='submit' class="btn btn-main mt-20">Place Order</button >
+                      <button type='submit'  class="btn btn-main mt-20">Place Order</button >
                       
                       </form>
                         <div class="verified-icon">
@@ -141,19 +203,178 @@
     </div>
  </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="coupon-modal" tabindex="-1" role="dialog">
-       <div class="modal-dialog" role="document">
-          <div class="modal-content">
-             <div class="modal-body">
-                <form>
-                   <div class="form-group">
-                      <input class="form-control" type="text" placeholder="Enter Coupon Code">
-                   </div>
-                   <button type="submit" class="btn btn-main">Apply Coupon</button>
-                </form>
-             </div>
-          </div>
-       </div>
-    </div>
-    {% endblock %}
+  <!-- Modal -->
+  <div class="modal fade" id="coupon-modal" tabindex="-1" role="dialog">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-body">
+            <form id="couponss" method='POST'>
+               {% csrf_token %}
+               <div class="form-group">
+                  <input class="form-control" id='coupon_code' type="text" placeholder="Enter Coupon Code" value="">
+               </div>
+               <input type="submit"  class="btn btn-main" value='Apply Coupon'>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+
+ <script>
+   function handleChange(src) {
+   
+   var f_name = document.getElementById("f_name" + src).value
+   var l_name = document.getElementById("l_name" + src).value
+   var emaill = document.getElementById("emaill" + src).value
+   var p_number = document.getElementById("p_number" + src).value
+   var address1 = document.getElementById("address1" + src).value
+   var address2 = document.getElementById("address2" + src).value
+   var f_state = document.getElementById("f_state" + src).value
+   var f_city = document.getElementById("f_city" + src).value
+   var f_country = document.getElementById("f_country" + src).value
+   
+   
+       //default saved home address
+       if(src){
+       document.getElementById("first_name").value=f_name;
+       document.getElementById("last_name").value=l_name;
+       document.getElementById("email").value=emaill;
+       document.getElementById("phone_number").value=p_number;
+       document.getElementById("address_line_1").value=address1;
+       document.getElementById("address_line_2").value=address2;
+       document.getElementById("state").value=f_state;
+       document.getElementById("city").value=f_city;
+       document.getElementById("country").value=f_country;
+     }
+    
+   }
+
+
+	$(document).on('submit', '#couponss', function (e) {
+		e.preventDefault();
+		var coupon_code = $('#coupon_code').val()
+		
+
+		$.ajax({
+			method: "GET",
+			url: "coupon",
+			dataType: 'json',
+			data: {
+		
+            'coupon_code' : coupon_code,
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (responce) {
+				console.log(responce)
+				if (responce.success == true) {
+					setTimeout(function(){
+                  window.location.replace('{{checkout}}');
+        
+                  }, 1500)
+                  
+                  Swal.fire({
+                    toast: true,
+                    icon: 'success',
+                    title: 'Coupon Applied Successfully',
+                    animation: false,
+                    position: 'top-right',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                  })
+				} 
+            else if (responce.coupon_valid == false) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "Not a valid coupon";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
+				
+				else if (responce.success == false) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "Coupon expired";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
+            else if (responce.coupon_valid == true) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "Not Post";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
+            else if (responce.coupon_exist == true) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "This coupon is currently applied";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
+            else if (responce.coupon_exist == false) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "This coupon is currently applied";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
+            else if (responce.already == true) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "Coupon applied once";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
+            else if (responce.exist == false) {
+               document.getElementById("coupon_code").value="";
+               document.getElementById("coupon_code").placeholder = "Not a valid Coupon";
+               document.getElementById("coupon_code").style.border = "solid red 1px";
+            }
+			}
+		})
+
+
+	});
+</script>
+<script>
+
+   function remo_coupons() {
+         $.ajax({
+         method: 'GET',
+         url: 'remove_coupon',
+         dataType: 'json',
+         data: {
+         
+         },
+        
+         success: function (responce) {
+            console.log('where')
+         if (responce.success == true) {
+            setTimeout(function(){
+               window.location.replace('{{checkout}}');
+      
+               }, 1500)
+               
+               Swal.fire({
+                  toast: true,
+                  icon: 'success',
+                  title: 'Coupon removed successfully',
+                  animation: false,
+                  position: 'top-right',
+                  showConfirmButton: false,
+                  timer: 3000,
+                  timerProgressBar: true,
+               })
+
+
+            
+            
+         }
+         else if (responce.success == false) {
+            window.location.replace('{{checkout}}');
+         }
+      
+         },
+      
+   })}
+           
+            
+               
+   
+
+</script>
+ 
+ 
+ 
+
+
+ {% endblock %}

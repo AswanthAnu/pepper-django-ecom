@@ -1,5 +1,7 @@
+from fileinput import FileInput
+from pyexpat import model
 from django import forms
-from .models import Account
+from .models import Account, UserProfile
 
 # adding form to html
 
@@ -22,6 +24,7 @@ class RegistrationForm(forms.ModelForm):
             'phone_number' : forms.TextInput (attrs={'id' : 'phone_number_id'}),
             'email' : forms.EmailInput (attrs={'id' : 'email_id'}),
             'password' : forms.PasswordInput (attrs={'id' : 'password_id'}),
+            'confirm_password' : forms.PasswordInput (attrs={'id' : 'confirm_password_id'}),
         }
 
   
@@ -44,7 +47,33 @@ class RegistrationForm(forms.ModelForm):
         self.fields['phone_number'].widget.attrs['placeholder'] = 'Phone Number'
         self.fields['email'].widget.attrs['placeholder'] = 'Email Address'
 
+        self.fields['first_name'].widget.attrs['value'] = ''
+        self.fields['last_name'].widget.attrs['value'] = ''
+        self.fields['phone_number'].widget.attrs['value'] = ''
+        self.fields['email'].widget.attrs['value'] = ''
+
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
         
 
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = Account
+        fields = ('first_name', 'last_name', 'phone_number')
+    
+    def __init__(self, *args, **kwargs):
+        super(UserForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'
+
+    
+class UserProfileForm(forms.ModelForm):
+    profile_picture = forms.ImageField(required=False, error_messages= {'Invalid' :("Image files only")}, widget=forms.FileInput)
+    class Meta:
+        model = UserProfile 
+        fields = ('address_line_1', 'address_line_2', 'city', 'state', 'country','profile_picture' )
+        
+    def __init__(self, *args, **kwargs):
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'
